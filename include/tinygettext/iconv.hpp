@@ -1,3 +1,6 @@
+// Hackily modified tinygettext IConv class to do nothing, thus avoiding the
+// dependency on iconv.
+// Original copyright notice:
 // tinygettext - A gettext replacement that works directly on .po files
 // Copyright (c) 2006 Ingo Ruhnke <grumbel@gmail.com>
 //
@@ -22,77 +25,19 @@
 
 #include <string>
 
-#ifdef TINYGETTEXT_WITH_SDL
-#  include "SDL.h"
-#else
-#  include <iconv.h>
-#endif
-
 namespace tinygettext {
-
-namespace detail {
-struct ConstPtrHack {
-  const char** ptr;
-  inline ConstPtrHack(char** ptr_) : ptr(const_cast<const char**>(ptr_)) {}
-  inline ConstPtrHack(const char** ptr_) : ptr(ptr_) {}
-  inline operator const char**() const { return ptr; }
-  inline operator char**() const { return const_cast<char**>(ptr); }
-};
-} // namespace detail
-
-#ifdef TINYGETTEXT_WITH_SDL
-using iconv_t = ::SDL_iconv_t;
-#else
-using iconv_t = ::iconv_t;
-#endif
-
-inline iconv_t iconv_open(const char* tocode, const char* fromcode)
-{
-#ifdef TINYGETTEXT_WITH_SDL
-  return SDL_iconv_open(tocode, fromcode);
-#else
-  return ::iconv_open(tocode, fromcode);
-#endif
-}
-
-inline size_t iconv(iconv_t cd,
-                    const char** inbuf, size_t* inbytesleft,
-                    char** outbuf, size_t* outbytesleft)
-{
-#ifdef TINYGETTEXT_WITH_SDL
-  return SDL_iconv(cd, inbuf, inbytesleft, outbuf, outbytesleft);
-#else
-  return ::iconv(cd, detail::ConstPtrHack(inbuf), inbytesleft, outbuf, outbytesleft);
-#endif
-}
-
-inline int iconv_close(iconv_t cd)
-{
-#ifdef TINYGETTEXT_WITH_SDL
-  return SDL_iconv_close(cd);
-#else
-  return ::iconv_close(cd);
-#endif
-}
 
 class IConv
 {
-private:
-  std::string to_charset;
-  std::string from_charset;
-  iconv_t cd;
-
 public:
-  IConv();
-  IConv(const std::string& fromcode, const std::string& tocode);
-  ~IConv();
+  IConv() {}
+  IConv(const std::string& fromcode, const std::string& tocode) {}
+  ~IConv() {}
 
-  void set_charsets(const std::string& fromcode, const std::string& tocode);
-  std::string convert(const std::string& text);
-
-private:
-  IConv (const IConv&);
-  IConv& operator= (const IConv&);
+  void set_charsets(const std::string& fromcode, const std::string& tocode) {}
+  std::string convert(const std::string& text) {
+    return text;  
+  }
 };
 
 } // namespace tinygettext
