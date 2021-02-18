@@ -127,6 +127,13 @@ public:
     return func;
   }
 
+  /** Translate a C string, returning a pointer to the cached translation or the
+      original pointer. Useful when passing a C string somewhere which does
+      not copy the string and expects it to remain valid. The returned pointer
+      will be invalid if this Dictionary is destroyed or this entry is
+      replaced. */
+  const char* translate(const char* msgid) const;
+
 private:
   Dictionary(const Dictionary&) = delete;
   Dictionary& operator=(const Dictionary&) = delete;

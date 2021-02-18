@@ -241,6 +241,23 @@ Dictionary::add_translation(const std::string& msgctxt, const std::string& msgid
   }
 }
 
+const char*
+Dictionary::translate(const char* msgid) const
+{
+  Entries::const_iterator i = entries.find(msgid);
+  if (i != entries.end() && !i->second.empty())
+  {
+    return i->second[0].c_str();
+  }
+  else
+  {
+    log_info << "Couldn't translate: " << msgid << std::endl;
+
+    if (m_has_fallback) return m_fallback->translate(msgid);
+    else return msgid;
+  }
+}
+
 } // namespace tinygettext
 
 /* EOF */
